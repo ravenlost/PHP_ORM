@@ -7,7 +7,7 @@ ORM Library class to create or load an object representing a database table row 
 
 <h2>Defining an object's definition template:</h2>
 
-To create a new object template, use <a href="https://github.com/ravenlost/CorbeauPerdu/blob/master/PHP/ORM/src/User.php">User.php</a> as a starting point.
+To create a new object template, use <a href="https://github.com/ravenlost/PHP_ORM/blob/master/src/User.php">User.php</a> as a starting point.
 The following methods needs to be called (in order!) and modified for your needs in the constructor:
 <ol>
   <li>$this->setTablename()  : sets the database tablename</li>

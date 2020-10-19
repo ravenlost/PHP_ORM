@@ -3,7 +3,7 @@ ORM Library class to create or load an object representing a database table row 
 
 **@requires DBWrapper <a href="https://github.com/ravenlost/CorbeauPerdu/tree/master/PHP/Database">https://github.com/ravenlost/CorbeauPerdu/tree/master/PHP/Database</a>**
 
-**See: <a href="https://github.com/ravenlost/CorbeauPerdu/blob/master/PHP/ORM/UsageExamples/ORMUsageExamples.php">ORMUsageExamples.php</a>**
+**See: <a href="https://github.com/ravenlost/PHP_ORM/blob/master/UsageExamples/ORMUsageExamples.php">ORMUsageExamples.php</a>**
 
 <h2>Defining an object's definition template:</h2>
 

@@ -14,16 +14,37 @@ use PDO;
 
 /**
  * Base ORM object: all objects (i.e. User, Contract, etc) needs to extend this class!
- * Copyright (C) 2020, Patrick Roy
- * This file may be used under the terms of the GNU Lesser General Public License, version 3.
- * For more details see: https://www.gnu.org/licenses/lgpl-3.0.html
- * This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2020 Patrick Roy
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  *
  * Special Thanks to P.Sicard for his help on this one explaining the idea and concept ;)
  *
- * @todo: eventually add the ability to set an array of columns as $primaryKey.
+ * @todo: eventually add the ability to set an array of columns as $primaryKey 
+ * @todo: add a isUniqueValue("key", "value") value to check if a given member + value is already defined in the database (say to enforce a uniq constraint); will just do a select...
+ * @todo: add a setDBWrapper() function to force set a DBWrapper private: 
+ *        its args should be the same possible values as the DBWrapper's constructor (by config file, by IP, or eventually by DSN name)
+ * @todo check if we can method overload from out child classes (i.e. override the delete() method to first send an email, and then call the parent's (this) delete() method!  
+ *  
  * This would involve a lot of thickering around load(), save(), delete() and deleQueryRun() to check if primary key is array, etc.
  * Don't think I'll put this in place! Just place a damn auto-increment ID in those special tables ;P
  *
@@ -496,12 +517,12 @@ class ORMBase
       }
 
       //----------------------
-      //  multiple rows returned (zero rows caught in exception below)
+      //  multiple rows returned (zero rows caught in DBWrapperException below)
       else
       {
         if ( $returnEntities === false )
         {
-          throw new ORMException('More than 1 row returned! Cannot initialize the object with many rows! Use ' . get_class($this) . '::find() to get an array of objects.', 6);
+          throw new ORMException("More than 1 row returned (total $rowsfound)! Cannot initialize the object with many rows! Use " . get_class($this) . '::find() to get an array of objects.', 6);
         }
         else
         {
@@ -881,6 +902,13 @@ class ORMBase
    * @throws DBWrapperException
    * @throws ORMException
    *
+   * @todo: allow sending of a list (or simple array) to use in a WHERE colxyz IN () clause: 
+   * if filter = (array or string) and arg list = true
+   * $filter = ['colxyz' => "'v1','v2','v3'" ] // value could a string or an array
+   * 
+   * dynamically build WHERE with: colxyz IN (:p1,:p2,:p3 )
+   * and split "'v1','v2','v3'" into seperate elements array in $paramValues to protect agains SQL Injections
+   *
    * @return integer number of successful deletes
    */
   protected function deleteQueryRun($filter, $paramValuesArg = null, $multiTransactions = false, $forceCloseDB = false, &$db = null)
@@ -1055,7 +1083,7 @@ class ORMBase
     // validate if binary format
     elseif ( $prop_datatype === 'binary' )
     {
-      // @todo..
+      // @todo validDataType for binary 
     }
     // any other datatype, use PHP gettype() to check
     else

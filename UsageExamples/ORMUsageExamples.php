@@ -3,13 +3,6 @@
 /******************************************************************************
  * ORM Usage Demo
  * 
- * Copyright (C) 2020, Patrick Roy
- * This file may be used under the terms of the GNU Lesser General Public License, version 3.
- * For more details see: https://www.gnu.org/licenses/lgpl-3.0.html
- * This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- * 
  * Create or load an object representing a database table (i.e. User, Contract, etc.)
  * 
  * Object Methods:

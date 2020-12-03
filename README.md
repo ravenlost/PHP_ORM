@@ -27,6 +27,7 @@ That's all you need! You can now use your Object class.
   <li>$object->save()        : save the loaded object into the database.</li>
   <li>$object->delete()      : delete the loaded object from the database.</li>
   <li>$object->isDirty()     : is the object new, or as been modified?</li>
+  <li>$object->getEntity()   : retrieve the entity object that holds the data (for debug purposes!)</li>
   <li>$object->propertyName  : set or get propertyName's column value!</li>
 </ol>
 

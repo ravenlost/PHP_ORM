@@ -157,6 +157,14 @@ class ORMBase
   private $useUpsert = false;
 
   /**
+   * getEntity()
+   * For debug only - Returns the entity object to view its content!
+   */
+  public function getEntity(){
+    return $this->entity;
+  }
+  
+  /**
    * Magic getter method __get()
    * Called whenever you attempt to read a non-existing or private property of an object.
    * @param string $property Property name to get
@@ -182,9 +190,9 @@ class ORMBase
 
     // validate allowed to modify the property
     if ( $this->entity[$property]['readonly'] ) throw new ORMException("Property '$property' is readonly!", 2);
-
+   
     // set property only if value differs and set isDirty!
-    if ( $this->entity[$property]['value'] != $value )
+    if ( ( ! isset($this->entity[$property]['value']) and (isset($value) ) ) or ($this->entity[$property]['value'] != $value) )
     {
       try
       {

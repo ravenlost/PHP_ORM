@@ -1,7 +1,7 @@
 # CorbeauPerdu\ORM\ORMBase Class
 ORM Library class to create or load an object representing a database table row (i.e. User, Contract, etc.).
 
-**@requires DBWrapper <a href="https://github.com/ravenlost/PHP_DBWrapper">https://github.com/ravenlost/PHP_DBWrapper</a>**
+**@requires <a href="https://github.com/ravenlost/PHP_DBWrapper">CorbeauPerdu\Database\DBWrapper</a>**
 
 **See: <a href="https://github.com/ravenlost/PHP_ORM/blob/master/UsageExamples/ORMUsageExamples.php">ORMUsageExamples.php</a>**
 

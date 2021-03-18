@@ -530,7 +530,14 @@ class ORMBase
       {
         if ( $returnEntities === false )
         {
-          throw new ORMException("More than 1 row returned (total $rowsfound)! Cannot initialize the object with many rows! Use " . get_class($this) . '::find() to get an array of objects.', 6);
+          if($rowsfound > 1) {
+            throw new ORMException("More than 1 row returned (total $rowsfound)! Cannot initialize the object with many rows! Use " . get_class($this) . '::find() to get an array of objects.', 6);
+          }
+          else {
+            // if we have 0 rows, it should have been caught in the DBWrapperException, 
+            // UNLESS setThrowExOnNoData is FALSE in DBWrapper, in which case we are just returning null !
+            return null;
+          }
         }
         else
         {

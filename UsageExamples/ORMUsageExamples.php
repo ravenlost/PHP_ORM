@@ -12,7 +12,10 @@
  * 2. object->save()        : save the loaded object into the database.
  * 3. object->delete()      : delete the loaded object from the database.
  * 4. object->isDirty()     : is the object new, or as been modified?
- * 5. object->propertyName  : set or get propertyName's column value!
+ * 5. object->getEntity()   : retrieve the entity object that holds the data (for debug purposes!)
+ * 6. object->isNew()       : is the object in NEW state?
+ * 7. object->isLoaded()    : is the object loaded from or saved into the DB?
+ * 8. object->propertyName  : set or get propertyName's column value!
  * 
  * Static Methods:
  * 

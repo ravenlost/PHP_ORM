@@ -60,10 +60,11 @@ use PDO;
  *                 2020/08/05 by PRoy - Bug fix: couldn't UPDATE primary key values! Added a private $primaryKeyInitialValue and now setting this initial primary key value upon loading the object.
  *                                      It is then used in the save()'s UPDATE WHERE clause, instead of the old entity[$this->primaryKey]['value'], which would have the 'new' value, thus failing the where clause!
  *                 2020/08/08 by PRoy - Minor bug fix in the way we checked if property value is different and newvalue in the __set() and added a return value in save()
- *                 2020/09/16 by PRoy - Added magic __isset()    
+ *                 2020/09/16 by PRoy - Added magic __isset()
+ *                 2021/03/19 by PRoy - Added isLoaded() state and other bux fix when load() would return 0 rows and but DBWrapper was set to not through an exception when no data found. 
  *                                                       
  * @author Patrick Roy (ravenlost2@gmail.com)
- * @version 1.2.4
+ * @version 1.2.5
  * @uses \CorbeauPerdu\Database\DBWrapper
  */
 class ORMBase
@@ -138,6 +139,14 @@ class ORMBase
    */
   private $isNew = false;
 
+  /**
+   * Is the entity loaded from DB? 
+   * If an object was properly loaded, it'll become true;
+   * else, assuming object's data wasn't loaded from DB
+   * @var boolean
+   */
+  private $isLoaded = false;
+  
   /**
    * Default valid datetime format if not specified within addMember()
    * @var string
@@ -275,6 +284,38 @@ class ORMBase
     $this->isNew = $v;
   }
 
+  /**
+   * isNew()
+   * Set is the entity a new object (otherwise, was loaded from DB)
+   * @return bool
+   */
+  public function isNew()
+  {
+    return $this->isNew;
+  }
+
+  /**
+   * setIsLoaded()
+   * Set is the entity loaded from the DB
+   * @param bool $v
+   */
+  protected function setIsLoaded(bool $v)
+  {
+    $this->isLoaded = $v;
+  }
+  
+  /**
+   * isLoaded()
+   * Is the entity loaded from DB? <br/>
+   * Will be true if an object was properly loaded,<br/>
+   * else, assuming object's data wasn't loaded from DB. 
+   * @return bool
+   */
+  public function isLoaded()
+  {
+    return $this->isLoaded;
+  }
+  
   /**
    * setDateTimeFormat()
    * Set default valid datetime format
@@ -514,8 +555,11 @@ class ORMBase
             $this->primaryKeyInitialValue = $val;
           }
         }
+        
+        // set object to loaded
+        $this->setIsLoaded(true);
 
-        // return instance of this object (this will only be true if coming from Object::find() method defined in the Object classes (i.e. User)
+        // return instance of this object (this will only be true if coming from Object::find() method, defined in ORMExtras trait which the object classes (User) uses.
         if ( $returnEntities )
         {
           // the returned enitity is NOT new! Set it so, otherwise find() will think each objects are new!
@@ -534,9 +578,9 @@ class ORMBase
             throw new ORMException("More than 1 row returned (total $rowsfound)! Cannot initialize the object with many rows! Use " . get_class($this) . '::find() to get an array of objects.', 6);
           }
           else {
-            // if we have 0 rows, it should have been caught in the DBWrapperException, 
-            // UNLESS setThrowExOnNoData is FALSE in DBWrapper, in which case we are just returning null !
-            return null;
+            // 0 rows found : this case scenario would normally but caught by the DBWrapperException below,
+            // UNLESS the DBWrapper's setThrowExOnNoData() is set to FALSE. In such a case, 
+            // one has to use $object->isLoaded() method to know if object was properly loaded or not. 
           }
         }
         else
@@ -547,9 +591,6 @@ class ORMBase
           foreach ( $data as $row )
           {
             $new_entity = new $this();
-
-            // the returned entities are NOT new! Set them so, otherwise find() will think each objects are new!
-            $new_entity->setIsNew(false);
 
             foreach ( $row as $col => $val )
             {
@@ -563,6 +604,12 @@ class ORMBase
               }
             }
 
+            // the returned entities are NOT new! Set them so, otherwise find() will think each objects are new!
+            $new_entity->setIsNew(false);
+            
+            // set entities to loaded
+            $new_entity->setIsLoaded(true);
+            
             array_push($entities, $new_entity);
           }
 
@@ -793,6 +840,7 @@ class ORMBase
       // reset state of object
       $this->isDirty = false;
       $this->isNew = false;
+      $this->isLoaded = true;
 
       // Close DB? don't close in storeData: the closing needs to be done AFTER the getMySQLWarnings() check!
       // only unsetting DBWrapper objects created within this class and NOT the one passed in args by reference!

@@ -61,7 +61,9 @@ use PDO;
  *                                      It is then used in the save()'s UPDATE WHERE clause, instead of the old entity[$this->primaryKey]['value'], which would have the 'new' value, thus failing the where clause!
  *                 2020/08/08 by PRoy - Minor bug fix in the way we checked if property value is different and newvalue in the __set() and added a return value in save()
  *                 2020/09/16 by PRoy - Added magic __isset()
- *                 2021/03/19 by PRoy - Added isLoaded() state and other bux fix when load() would return 0 rows and but DBWrapper was set to not through an exception when no data found. 
+ *                 2021/03/19 by PRoy - Added isLoaded() state and other bux fix when load() would return 0 rows and but DBWrapper was set to not through an exception when no data found.
+ *                 2021/03/21 by PRoy - Added isDeleted() getter/setter
+ *                  
  *                                                       
  * @author Patrick Roy (ravenlost2@gmail.com)
  * @version 1.2.5
@@ -146,7 +148,7 @@ class ORMBase
    * @var boolean
    */
   private $isLoaded = false;
-  
+
   /**
    * Default valid datetime format if not specified within addMember()
    * @var string
@@ -169,10 +171,11 @@ class ORMBase
    * getEntity()
    * For debug only - Returns the entity object to view its content!
    */
-  public function getEntity(){
+  public function getEntity()
+  {
     return $this->entity;
   }
-  
+
   /**
    * Magic getter method __get()
    * Called whenever you attempt to read a non-existing or private property of an object.
@@ -199,9 +202,9 @@ class ORMBase
 
     // validate allowed to modify the property
     if ( $this->entity[$property]['readonly'] ) throw new ORMException("Property '$property' is readonly!", 2);
-   
+
     // set property only if value differs and set isDirty!
-    if ( ( ! isset($this->entity[$property]['value']) and (isset($value) ) ) or ($this->entity[$property]['value'] != $value) )
+    if ( ( ! isset($this->entity[$property]['value']) and ( isset($value) ) ) or ( $this->entity[$property]['value'] != $value ) )
     {
       try
       {
@@ -228,7 +231,7 @@ class ORMBase
   {
     // empty() returns FALSE if var exists and has a non-empty, non-zero value. Otherwise returns TRUE.
     // but still need to reverse returned value from empty(), and I don't understand why!
-    return  ( empty($this->entity[$property]['value'] ) == false );
+    return ( empty($this->entity[$property]['value']) == false );
   }
 
   /**
@@ -303,7 +306,7 @@ class ORMBase
   {
     $this->isLoaded = $v;
   }
-  
+
   /**
    * isLoaded()
    * Is the entity loaded from DB? <br/>
@@ -315,7 +318,28 @@ class ORMBase
   {
     return $this->isLoaded;
   }
-  
+
+  /**
+   * setIsDeleted()
+   * Set is the entity deleted from the DB
+   * @param bool $v
+   */
+  protected function setIsDeleted(bool $v)
+  {
+    $this->deleted = $v;
+  }
+
+  /**
+   * isDeleted()
+   * Is the entity deleted from DB? <br/>
+   * Will be true if an object was previously deleted
+   * @return bool
+   */
+  public function isDeleted()
+  {
+    return $this->deleted;
+  }
+
   /**
    * setDateTimeFormat()
    * Set default valid datetime format
@@ -555,7 +579,7 @@ class ORMBase
             $this->primaryKeyInitialValue = $val;
           }
         }
-        
+
         // set object to loaded
         $this->setIsLoaded(true);
 
@@ -574,10 +598,12 @@ class ORMBase
       {
         if ( $returnEntities === false )
         {
-          if($rowsfound > 1) {
+          if ( $rowsfound > 1 )
+          {
             throw new ORMException("More than 1 row returned (total $rowsfound)! Cannot initialize the object with many rows! Use " . get_class($this) . '::find() to get an array of objects.', 6);
           }
-          else {
+          else
+          {
             // 0 rows found : this case scenario would normally but caught by the DBWrapperException below,
             // UNLESS the DBWrapper's setThrowExOnNoData() is set to FALSE. In such a case, 
             // one has to use $object->isLoaded() method to know if object was properly loaded or not. 
@@ -606,10 +632,10 @@ class ORMBase
 
             // the returned entities are NOT new! Set them so, otherwise find() will think each objects are new!
             $new_entity->setIsNew(false);
-            
+
             // set entities to loaded
             $new_entity->setIsLoaded(true);
-            
+
             array_push($entities, $new_entity);
           }
 
@@ -785,7 +811,7 @@ class ORMBase
             $dbwarningsErrStr .= 'Level: ' . $w->Level . PHP_EOL;
             $dbwarningsErrStr .= 'Code: ' . $w->Code . PHP_EOL;
             $dbwarningsErrStr .= 'Message: ' . $w->Message . PHP_EOL . PHP_EOL;
-            //           $dbwarningsErrStr .= '- ' . $w->Message . ' [code ' . $w->Code . '].' . PHP_EOL;
+            //$dbwarningsErrStr .= '- ' . $w->Message . ' [code ' . $w->Code . '].' . PHP_EOL;
           }
 
           $dbwarningsErrStr .= "SQL = $sql" . PHP_EOL;

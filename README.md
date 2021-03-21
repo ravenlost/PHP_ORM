@@ -29,6 +29,7 @@ That's all you need! You can now use your Object class.
   <li>$object->isDirty()     : is the object new, or as been modified?</li>
   <li>$object->isLoaded()    : is the object loaded from or saved into the DB?</li>
   <li>$object->isNew()       : is the object in NEW state?</li>
+  <li>$object->isDeleted()   : is the object in a DELETED (from DB) state?</li>
   <li>$object->getEntity()   : retrieve the entity object that holds the data (for debug purposes!)</li>
   <li>$object->propertyName  : set or get propertyName's column value!</li>
 </ol>

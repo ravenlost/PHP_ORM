@@ -24,7 +24,7 @@
  * 2. Object::deleteQuery() : delete objects from the database.
  * 3. Object::getDBWrapper(): retrieve a DBWrapper object
  * 
- * Trick: the constructor(), find() and deleteQuery() all accept a $forceCloseDB and $dbwrapper reference parameter!
+ * Trick: the constructor(), save(), find() and deleteQuery() all accept a $forceCloseDB and $dbwrapper reference parameter!
  * This allows you to either force closing the DB connection after each query, and it'll also allow you to use the 
  * same DBWrapper / PDO Connection throughout your page if desired.
  * 
